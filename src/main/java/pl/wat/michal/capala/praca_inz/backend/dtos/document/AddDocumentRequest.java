@@ -1,4 +1,4 @@
-package pl.wat.michal.capala.praca_inz.backend.dtos;
+package pl.wat.michal.capala.praca_inz.backend.dtos.document;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
