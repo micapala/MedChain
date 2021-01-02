@@ -1,0 +1,21 @@
+<div fxLayoutAlign="center center" fxFlexFill class="main-div">
+  <mat-card fxFlex="25">
+    <mat-toolbar color="primary">Strona logowania rozproszonego rejestru</mat-toolbar>
+    <form fxLayoutAlign="stretch" fxLayout="column"  [formGroup]="loginForm" (ngSubmit)="loginProcess()">
+      <mat-form-field appearance="fill" class="input" >
+        <mat-label>Login</mat-label>
+        <input matInput formControlName="username"/>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Hasło</mat-label>
+        <input matInput type="password" formControlName="password">
+      </mat-form-field>
+      <button mat-raised-button type="submit">Login</button>
+      <div *ngIf="error">{{error}}</div>
+    </form>
+  </mat-card>
+</div>
+
+
+
+

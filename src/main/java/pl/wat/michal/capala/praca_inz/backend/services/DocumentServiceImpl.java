@@ -3,20 +3,19 @@ package pl.wat.michal.capala.praca_inz.backend.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mongodb.DBObject;
 import org.bson.BsonBinarySubType;
 import org.bson.types.Binary;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pl.wat.michal.capala.praca_inz.backend.dtos.AddDocumentRequest;
-import pl.wat.michal.capala.praca_inz.backend.dtos.DocumentData;
-import pl.wat.michal.capala.praca_inz.backend.dtos.DocumentDataResponse;
-import pl.wat.michal.capala.praca_inz.backend.dtos.DocumentResponse;
+import pl.wat.michal.capala.praca_inz.backend.dtos.document.AddDocumentRequest;
+import pl.wat.michal.capala.praca_inz.backend.dtos.document.ChaincodeDocument;
+import pl.wat.michal.capala.praca_inz.backend.dtos.document.DocumentFileDataResponse;
+import pl.wat.michal.capala.praca_inz.backend.dtos.document.DocumentResponse;
 import pl.wat.michal.capala.praca_inz.backend.repositories.DocumentDataRepository;
 import pl.wat.michal.capala.praca_inz.backend.repositories.HyperledgerRepository;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,22 +34,25 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public List<DocumentResponse> getAllPatientDocuments(String patientPesel) {
-        return jsonToList(hyperledgerRepository.evaluateChaincodeTransaction("mychannel",
+        List <ChaincodeDocument> chaincodeDocuments = jsonToList(hyperledgerRepository.evaluateChaincodeTransaction("mychannel",
                 "dokumenty",
                 "QueryDocuments",
                 new String("{\"selector\":{\"patientPesel\":\"" + patientPesel + "\"}}")));
+        return chaincodeToResponse(chaincodeDocuments);
     }
 
     @Override
     public List<DocumentResponse> getAllDoctorDocuments(String doctorPesel) {
-        return jsonToList(hyperledgerRepository.evaluateChaincodeTransaction("mychannel",
+        List <ChaincodeDocument> chaincodeDocuments = jsonToList(hyperledgerRepository.evaluateChaincodeTransaction("mychannel",
                 "dokumenty",
                 "QueryDocuments",
                 new String("{\"selector\":{\"doctorPesel\":\"" + doctorPesel + "\"}}")));
+        return chaincodeToResponse(chaincodeDocuments);
+
     }
 
     @Override
-    public DocumentData downloadDocument(String documentId) {
+    public DocumentFileDataResponse downloadDocument(String documentId) {
         return documentDataRepository.findById(documentId).get();
     }
 
@@ -72,10 +74,10 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public void addDocument(AddDocumentRequest addDocumentRequest) {
-        DocumentData documentData = new DocumentData();
+        DocumentFileDataResponse documentFileDataResponse = new DocumentFileDataResponse();
         try {
-            documentData.setFileData(new Binary(BsonBinarySubType.BINARY, addDocumentRequest.getFileData().getBytes()));
-            documentData = documentDataRepository.insert(documentData);
+            documentFileDataResponse.setFileData(new Binary(BsonBinarySubType.BINARY, addDocumentRequest.getFileData().getBytes()));
+            documentFileDataResponse = documentDataRepository.insert(documentFileDataResponse);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -83,20 +85,32 @@ public class DocumentServiceImpl implements DocumentService {
         hyperledgerRepository.submitChaincodeTransaction("mychannel",
                 "dokumenty",
                 "CreateDocument",
-                documentData.getId(), addDocumentRequest.getPatientPesel(), addDocumentRequest.getDoctorPesel(),
+                documentFileDataResponse.getId(), addDocumentRequest.getPatientPesel(), addDocumentRequest.getDoctorPesel(),
                 addDocumentRequest.getWriteDate(), addDocumentRequest.getType(), "[]");
 
     }
 
-    private List<DocumentResponse> jsonToList (String json) {
+    private List<ChaincodeDocument> jsonToList (String json) {
         ObjectMapper mapper = new ObjectMapper();
         try {
-            List<DocumentResponse> responseList = Arrays.asList(mapper.readValue(json, DocumentResponse[].class));
+            List<ChaincodeDocument> responseList = Arrays.asList(mapper.readValue(json, ChaincodeDocument[].class));
             return responseList;
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return null;
         }
+
+    }
+
+    private List<DocumentResponse> chaincodeToResponse (List<ChaincodeDocument> chaincodeDocuments){
+
+        List<DocumentResponse> documentResponseList = new ArrayList<>();
+        for (int i =0; i< chaincodeDocuments.size();i++) {
+            ChaincodeDocument chaincodeDocument = chaincodeDocuments.get(i);
+            DocumentResponse documentResponse = new DocumentResponse(chaincodeDocument.getDocumentID(),chaincodeDocument.getPreparationDate(),chaincodeDocument.getDocType());
+            documentResponseList.add(documentResponse);
+        }
+        return documentResponseList;
 
     }
 }

@@ -1,0 +1,13 @@
+<nav *ngIf="user">
+  <div fxFlexFill>
+    <mat-card fxFlex="25">
+      <a routerLink="/">Strona startowa</a>
+      <a routerLink="/documentsList">Lista Dokumentów</a>
+      <a routerLink="/register">Zarejestruj</a>
+      <a routerLink="/addDocument">Dodaj dokument</a>
+      <a class="nav-item nav-link"  *ngIf="isLekarz">Lekarz</a>
+      <button mat-raised-button type="submit" (click)="logout()">Wyloguj</button>
+    </mat-card>
+  </div>
+</nav>
+<router-outlet></router-outlet>

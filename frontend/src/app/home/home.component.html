@@ -1,0 +1,16 @@
+<div class="card mt-4">
+  <h4 class="card-header">Strona startowa</h4>
+  <div class="card-body">
+      <p>Witaj na stronie rozproszonego rejestru dokumentów medycznych z wykorzystaniem technologii blockchain</p>
+      <p>Twoją rolą jest: <strong>{{user.role}}</strong>.</p>
+      <p class="mb-1">Zalogowany użytkownik:</p>
+      <div *ngIf="loading" class="spinner-border spinner-border-sm"></div>
+      <ul *ngIf="userFromApi">
+          <li>Login: {{userFromApi.login}} </li>
+          <li>Imie: {{userFromApi.name}} </li>
+          <li>Nazwisko: {{userFromApi.surname}}</li>
+          <li>Płeć: {{userFromApi.gender}}</li>
+          <li>Atrybuty: {{userFromApi.attrs}}</li>
+      </ul>
+  </div>
+</div>

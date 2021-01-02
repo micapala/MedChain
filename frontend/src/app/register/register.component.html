@@ -1,0 +1,37 @@
+<form [formGroup]="registerForm" (ngSubmit)="onSubmit()" fxLayout="column">
+  <mat-form-field appearance="fill" class="input" >
+    <mat-label>Login/Pesel</mat-label>
+    <input matInput formControlName="login"/>
+  </mat-form-field>
+  <mat-form-field appearance="fill" class="input" >
+    <mat-label>Hasło</mat-label>
+    <input matInput formControlName="password"/>
+  </mat-form-field>
+  <mat-form-field appearance="fill">
+    <mat-label>Rola</mat-label>
+    <select matNativeControl formControlName="role">
+      <option value="Administrator">Administrator</option>
+      <option value="Administrator_placowki">Administrator Placówki</option>
+      <option value="Lekarz">Lekarz</option>
+      <option value="Pacjent">Pacjent</option>
+    </select>
+  </mat-form-field>
+  <mat-form-field appearance="fill" class="input" >
+    <mat-label>Imie</mat-label>
+    <input matInput formControlName="name"/>
+  </mat-form-field>
+  <mat-form-field appearance="fill" class="input" >
+    <mat-label>Nazwisko</mat-label>
+    <input matInput formControlName="surname"/>
+  </mat-form-field>
+  <mat-form-field appearance="fill">
+    <mat-label>Płeć</mat-label>
+    <select matNativeControl formControlName="gender">
+      <option value="mezczyzna">Mężczyzna</option>
+      <option value="kobieta">Kobieta</option>
+    </select>
+  </mat-form-field>
+  <button mat-raised-button type="submit">Zarejestruj</button>
+
+
+</form>
